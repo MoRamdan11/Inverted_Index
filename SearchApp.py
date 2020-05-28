@@ -72,29 +72,42 @@ class Tree:
 t = Tree()
 def upload(self):
         t.root = None
-        #self.textBrowser.zoomIn(1)
+        # self.textBrowser.zoomIn(1)
         try:
             name = QFileDialog.getOpenFileNames()
             self.progressBar.setVisible(True)
             n = len(name[0])
+            # print(n)
             self.progressBar.setMaximum(n)
             t.name = name
-            for i in range(1000000):
+            for i in range(n):
                 try:
-                    with open(name[0][i])as f:
+                    with open(name[0][i], encoding='UTF-8')as f:
+                        # f = open(name[0][i], encoding='UTF-8')
                         bio = f.read()
-                    for j in bio.split():
-                        j = j.replace(",", "").replace(".", "").replace(":", "").replace("/","").replace("?", "").replace("!","").replace(";","")
+                        # print(f.read())
+                        import re
+                    for j in re.split(r'[;,.:)({}!?\s]\s*', bio):
+                        j = j.replace(",", " ").replace(".", " ").replace(":", " ").replace("/", " ").replace("?",
+                                                                                                              "").replace(
+                            "!", " ").replace(";", " ").replace(")", " ").replace("(", " ").replace("{", " ").replace(
+                            "}",
+                            " ").replace(
+                            "[", " ").replace("]", " ").replace('”', " ").replace('“', " ").replace("シ", " ").replace(
+                            "し", " ").replace("...", " ")
+                        # print(j.lower())
                         t.InsertNode(j.lower(), i + 1)
-                    self.progressBar.setValue(i+1)
+                        self.progressBar.setValue(i + 1)
                 except:
-                    break
-        except:
-            self.progressBar.setValue(False)
-            self.progressBar.setVisible(False)
-            self.lineEdit_2.clear()
-            self.lineEdit_2.setStyleSheet("color: rgb(255, 255, 255);""border-color: rgb(255, 255, 127);")  # yellow
-            self.lineEdit_2.setText("Invalid File")
+                    print(i)
+        finally:
+            self.progressBar.setValue(n)
+        # '''except:
+        #     self.progressBar.setValue(False)
+        #     self.progressBar.setVisible(False)
+        #     self.lineEdit_2.clear()
+        #     self.lineEdit_2.setStyleSheet("color: rgb(255, 255, 255);""border-color: rgb(255, 255, 127);")  # yellow
+        #     self.lineEdit_2.setText("Invalid File")'''
 
     def search(self):
         self.progressBar.setVisible(False)
@@ -109,17 +122,19 @@ def upload(self):
         found = t.findNode(word)
         if found == -1:  # word not found
             self.lineEdit_2.clear()
-            self.lineEdit_2.setStyleSheet("color: rgb(255, 255, 255);""border-color: rgb(255, 255, 127);")#yellow
+            self.lineEdit_2.setStyleSheet("color: rgb(255, 255, 255);""border-color: rgb(255, 255, 127);")  # yellow
             self.lineEdit_2.setText("Not Found")
         else:
             self.lineEdit_2.clear()
             self.lineEdit_2.setStyleSheet("border-color: rgb(48, 47, 47);")
             for i in range(100000):
                 try:
-                    with open(t.name[0][found[i] - 1])as f:
+                    with open(t.name[0][found[i] - 1], encoding="UTF-8")as f:
                         bio = f.read()
-                    self.textBrowser.insertPlainText("Document " + "'" + t.name[0][found[i] - 1] +"'"+ "\n\n" + bio+"\n")
-                    self.textBrowser.insertPlainText("-----------------------------------------------------------------------------------------------------------------\n")
+                    self.textBrowser.insertPlainText(
+                        "Document " + "'" + t.name[0][found[i] - 1] + "'" + "\n\n" + bio + "\n")
+                    self.textBrowser.insertPlainText(
+                        "-----------------------------------------------------------------------------------------------------------------\n")
                     self.textBrowser.find(word)
                 except:
                     return
